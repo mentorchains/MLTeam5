@@ -1,18 +1,14 @@
 #%%
-import pickle
-import json
+import pickle 
 import re
 import nltk
 from nltk.stem import WordNetLemmatizer
-nltk.download('wordnet')
+#nltk.download('wordnet')
 from nltk.corpus import wordnet
 import random
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import LinearSVC
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 from sklearn import metrics
@@ -87,35 +83,36 @@ result_df1 = result_df.sample(frac=1)
 #%%
 features = tfidf.fit_transform(result_df1.Posts).toarray()
 labels = result_df1.Forum_Name
-print("Each of the %d posts is represented by %d features (TF-IDF score of unigrams and bigrams)" %(features.shape))
+#print("Each of the %d posts is represented by %d features (TF-IDF score of unigrams and bigrams)" %(features.shape))
 #%%
 X = result_df1['Posts'] 
 y = result_df1['Forum_Name']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state = 0)
 #%%
-random_forest = RandomForestClassifier(n_estimators=100, max_depth=4, random_state=0)
-multi_nomial = MultinomialNB()
+#Cross validation cell can ignore as most accurate model is multinomial NB
+#random_forest = RandomForestClassifier(n_estimators=100, max_depth=4, random_state=0)
+#multi_nomial = MultinomialNB()
 
-models = [random_forest, multi_nomial]
+#models = [random_forest, multi_nomial]
 
-CV = 5
-cv_df = pd.DataFrame(index=range(CV * len(models)))
+#CV = 5
+#cv_df = pd.DataFrame(index=range(CV * len(models)))
 
-entries = []
-for model in models:
-  model_name = model.__class__.__name__
-  accuracies = cross_val_score(model, features, labels, scoring='accuracy', cv=CV)
-  for fold_idx, accuracy in enumerate(accuracies):
-    entries.append((model_name, fold_idx, accuracy))
+#entries = []
+#for model in models:
+#  model_name = model.__class__.__name__
+#  accuracies = cross_val_score(model, features, labels, scoring='accuracy', cv=CV)
+#  for fold_idx, accuracy in enumerate(accuracies):
+#    entries.append((model_name, fold_idx, accuracy))
     
-cv_df = pd.DataFrame(entries, columns=['model_name', 'fold_idx', 'accuracy'])
+#cv_df = pd.DataFrame(entries, columns=['model_name', 'fold_idx', 'accuracy'])
 #%%
-mean_accuracy = cv_df.groupby('model_name').accuracy.mean()
-std_accuracy = cv_df.groupby('model_name').accuracy.std()
+#mean_accuracy = cv_df.groupby('model_name').accuracy.mean()
+#std_accuracy = cv_df.groupby('model_name').accuracy.std()
 
-acc = pd.concat([mean_accuracy, std_accuracy], axis= 1, ignore_index=True)
-acc.columns = ['Mean Accuracy', 'Standard deviation']
-acc
+#acc = pd.concat([mean_accuracy, std_accuracy], axis= 1, ignore_index=True)
+#acc.columns = ['Mean Accuracy', 'Standard deviation']
+#acc
 #%%
 X_train, X_test, y_train, y_test,indices_train,indices_test = train_test_split(features, labels, result_df1.index, test_size=0.25, random_state=1)
 #model = RandomForestClassifier(n_estimators=100, max_depth=4, random_state=0)
@@ -125,8 +122,6 @@ model2.fit(X_train, y_train)
 #y_pred = model.predict(X_test)
 y_pred = model2.predict(X_test)
 #%%
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
-
 print(confusion_matrix(y_test,y_pred))
 print(classification_report(y_test,y_pred))
 print(accuracy_score(y_test, y_pred))

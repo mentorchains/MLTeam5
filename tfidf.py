@@ -3,6 +3,8 @@ import pickle
 import re
 import nltk
 from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import sent_tokenize as st
+#nltk.download('punkt')
 #nltk.download('wordnet')
 from nltk.corpus import wordnet
 import random
@@ -50,25 +52,35 @@ home_assist1 = preprocessing(home_assist)
 choice_community1 = preprocessing(choice_community10)
 hopscotch1 = preprocessing(hopscotch)
 code_academy1 =preprocessing(code_academy)
+#%%
+nltk.download('punkt')
+home_assist1 = [[x[0], st(x[1])] for x in home_assist1]
+choice_community1 = [[x[0], st(x[1])] for x in choice_community1]
+hopscotch1 = [[x[0], st(x[1])] for x in hopscotch1]
+code_academy1 = [[x[0], st(x[1])] for x in code_academy1]
 
 #%%
 home_assist2 = pd.DataFrame(home_assist1)
 home_assist2.columns = ['Links' , 'Posts']
+home_assist2['Posts_string'] = [','.join(map(str, l)) for l in home_assist2['Posts']]
 home_assist2.insert(0, 'Forum_Name', 'Home_Assist')
 del home_assist2['Links']
 
 choice_community3 = pd.DataFrame(choice_community1)
 choice_community3.columns = ['Links' , 'Posts']
+choice_community3['Posts_string'] = [','.join(map(str, l)) for l in choice_community3['Posts']]
 del choice_community3['Links']
 choice_community3.insert(0, 'Forum_Name', 'Choice Community')
 
 hopscotch2 = pd.DataFrame(hopscotch1)
 hopscotch2.columns = ['Links' , 'Posts']
+hopscotch2['Posts_string'] = [','.join(map(str, l)) for l in hopscotch2['Posts']]
 del hopscotch2['Links']
 hopscotch2.insert(0, 'Forum_Name', 'Hopscotch')
 
 code_academy2 = pd.DataFrame(code_academy1)
 code_academy2.columns = ['Links' , 'Posts']
+code_academy2['Posts_string'] = [','.join(map(str, l)) for l in code_academy2['Posts']]
 del code_academy2['Links']
 code_academy2.insert(0, 'Forum_Name', 'Code Academy')
 
@@ -81,11 +93,11 @@ result_df['forum_id'] = result_df['Forum_Name'].factorize()[0]
 result_df1 = result_df.sample(frac=1)
 
 #%%
-features = tfidf.fit_transform(result_df1.Posts).toarray()
+features = tfidf.fit_transform(result_df1.Posts_string)
 labels = result_df1.Forum_Name
 #print("Each of the %d posts is represented by %d features (TF-IDF score of unigrams and bigrams)" %(features.shape))
 #%%
-X = result_df1['Posts'] 
+X = result_df1['Posts_string'] 
 y = result_df1['Forum_Name']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state = 0)
 #%%

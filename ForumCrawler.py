@@ -51,5 +51,5 @@ print("Number of Topics in the website is",len(new_submissions))
 
 print("Saving the topic names as pickle file")
 
-# with open("all_the_topic_names.pickle", "wb") as output_file:
-#      pickle.dump(new_submissions, output_file)
+with open("all_the_topic_names.pickle", "wb") as output_file:
+     pickle.dump(new_submissions, output_file)

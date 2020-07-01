@@ -19,6 +19,7 @@ from IPython.display import display
 from sklearn.model_selection import train_test_split
 
 #%%
+#using webscraped data in the form of nested lists stored as pickle files
 with open("Ishan_home_assist_text_submissions11.pickle", "rb") as input_file:
     file1 = pickle.load(input_file)
 with open("Ishan_home_assist_text_submissions11.pickle", "rb") as input_file:
@@ -31,6 +32,9 @@ with open("shreya_codecademy_text_submissions.pickle", "rb") as input_file:
       code_academy = pickle.load(input_file)
 
 #%%
+
+#preprocessing the posts from the different forms
+
 choice_community10 = [[x[0], ' '.join(x[1])] for x in choice_community]
 
 def preprocessing(forum_data):
@@ -53,6 +57,7 @@ choice_community1 = preprocessing(choice_community10)
 hopscotch1 = preprocessing(hopscotch)
 code_academy1 =preprocessing(code_academy)
 #%%
+#convert paragraphs into sentences
 nltk.download('punkt')
 home_assist1 = [[x[0], st(x[1])] for x in home_assist1]
 choice_community1 = [[x[0], st(x[1])] for x in choice_community1]
@@ -60,28 +65,24 @@ hopscotch1 = [[x[0], st(x[1])] for x in hopscotch1]
 code_academy1 = [[x[0], st(x[1])] for x in code_academy1]
 
 #%%
-home_assist2 = pd.DataFrame(home_assist1)
-home_assist2.columns = ['Links' , 'Posts']
-home_assist2['Posts_string'] = [','.join(map(str, l)) for l in home_assist2['Posts']]
-home_assist2.insert(0, 'Forum_Name', 'Home_Assist')
-del home_assist2['Links']
+convert list data into dataframes
+def convert_to_df(df):
+  df1 = pd.DataFrame(df)
+  df1.columns = ['Links' , 'Posts']
+  df1['Posts_string'] = [','.join(map(str, l)) for l in df1['Posts']]
+  del df1['Links']
+  return df1
 
-choice_community3 = pd.DataFrame(choice_community1)
-choice_community3.columns = ['Links' , 'Posts']
-choice_community3['Posts_string'] = [','.join(map(str, l)) for l in choice_community3['Posts']]
-del choice_community3['Links']
+home_assist2 = convert_to_df(home_assist1)
+home_assist2.insert(0, 'Forum_Name', 'Home_Assist')
+
+choice_community3 = convert_to_df(choice_community1)
 choice_community3.insert(0, 'Forum_Name', 'Choice Community')
 
-hopscotch2 = pd.DataFrame(hopscotch1)
-hopscotch2.columns = ['Links' , 'Posts']
-hopscotch2['Posts_string'] = [','.join(map(str, l)) for l in hopscotch2['Posts']]
-del hopscotch2['Links']
+hopscotch2 = convert_to_df(hopscotch1)
 hopscotch2.insert(0, 'Forum_Name', 'Hopscotch')
 
-code_academy2 = pd.DataFrame(code_academy1)
-code_academy2.columns = ['Links' , 'Posts']
-code_academy2['Posts_string'] = [','.join(map(str, l)) for l in code_academy2['Posts']]
-del code_academy2['Links']
+code_academy2 = convert_to_df(code_academy1)
 code_academy2.insert(0, 'Forum_Name', 'Code Academy')
 
 forums = [home_assist2,code_academy2,hopscotch2,choice_community3]
@@ -95,43 +96,15 @@ result_df1 = result_df.sample(frac=1)
 #%%
 features = tfidf.fit_transform(result_df1.Posts_string)
 labels = result_df1.Forum_Name
-#print("Each of the %d posts is represented by %d features (TF-IDF score of unigrams and bigrams)" %(features.shape))
 #%%
 X = result_df1['Posts_string'] 
 y = result_df1['Forum_Name']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state = 0)
-#%%
-#Cross validation cell can ignore as most accurate model is multinomial NB
-#random_forest = RandomForestClassifier(n_estimators=100, max_depth=4, random_state=0)
-#multi_nomial = MultinomialNB()
 
-#models = [random_forest, multi_nomial]
-
-#CV = 5
-#cv_df = pd.DataFrame(index=range(CV * len(models)))
-
-#entries = []
-#for model in models:
-#  model_name = model.__class__.__name__
-#  accuracies = cross_val_score(model, features, labels, scoring='accuracy', cv=CV)
-#  for fold_idx, accuracy in enumerate(accuracies):
-#    entries.append((model_name, fold_idx, accuracy))
-    
-#cv_df = pd.DataFrame(entries, columns=['model_name', 'fold_idx', 'accuracy'])
-#%%
-#mean_accuracy = cv_df.groupby('model_name').accuracy.mean()
-#std_accuracy = cv_df.groupby('model_name').accuracy.std()
-
-#acc = pd.concat([mean_accuracy, std_accuracy], axis= 1, ignore_index=True)
-#acc.columns = ['Mean Accuracy', 'Standard deviation']
-#acc
 #%%
 X_train, X_test, y_train, y_test,indices_train,indices_test = train_test_split(features, labels, result_df1.index, test_size=0.25, random_state=1)
-#model = RandomForestClassifier(n_estimators=100, max_depth=4, random_state=0)
 model2 = MultinomialNB()
-#model.fit(X_train, y_train)
 model2.fit(X_train, y_train)
-#y_pred = model.predict(X_test)
 y_pred = model2.predict(X_test)
 #%%
 print(confusion_matrix(y_test,y_pred))

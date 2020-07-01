@@ -65,7 +65,7 @@ hopscotch1 = [[x[0], st(x[1])] for x in hopscotch1]
 code_academy1 = [[x[0], st(x[1])] for x in code_academy1]
 
 #%%
-convert list data into dataframes
+#convert list data into dataframes
 def convert_to_df(df):
   df1 = pd.DataFrame(df)
   df1.columns = ['Links' , 'Posts']

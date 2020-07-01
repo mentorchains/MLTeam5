@@ -110,3 +110,11 @@ y_pred = model2.predict(X_test)
 print(confusion_matrix(y_test,y_pred))
 print(classification_report(y_test,y_pred))
 print(accuracy_score(y_test, y_pred))
+#%%
+#save file
+import joblib 
+#save as pickle file
+joblib.dump(model2, 'multinomial_NB.pkl') 
+#%%
+# Load the model from the file 
+# multinomial_NB_from_joblib = joblib.load('multinomial_NB.pkl') 

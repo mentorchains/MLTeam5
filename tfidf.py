@@ -141,4 +141,4 @@ import joblib
 joblib.dump(model2, 'linear_svc.pkl') 
 #%%
 # Load the model from the file 
-# multinomial_NB_from_joblib = joblib.load('multinomial_NB.pkl') 
+# linear_svc_from_joblib = joblib.load('multinomial_NB.pkl') 

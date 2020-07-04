@@ -126,6 +126,34 @@ y = result_df1['Forum_Name']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state = 0)
 
 #%%
+#cross validation and accuracy check
+random_forest = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=0)
+multi_nomial = MultinomialNB()
+lin_clf = LinearSVC()
+
+models = [random_forest, multi_nomial, lin_clf]
+
+CV = 5
+cv_df = pd.DataFrame(index=range(CV * len(models)))
+
+entries = []
+for model in models:
+  model_name = model.__class__.__name__
+  accuracies = cross_val_score(model, features, labels, scoring='accuracy', cv=CV)
+  for fold_idx, accuracy in enumerate(accuracies):
+    entries.append((model_name, fold_idx, accuracy))
+    
+cv_df = pd.DataFrame(entries, columns=['model_name', 'fold_idx', 'accuracy'])
+
+#calculating avg. accuracy
+mean_accuracy = cv_df.groupby('model_name').accuracy.mean()
+std_accuracy = cv_df.groupby('model_name').accuracy.std()
+
+acc = pd.concat([mean_accuracy, std_accuracy], axis= 1, 
+          ignore_index=True)
+acc.columns = ['Mean Accuracy', 'Standard deviation']
+acc
+#%%
 X_train, X_test, y_train, y_test,indices_train,indices_test = train_test_split(features, labels, result_df1.index, test_size=0.25, random_state=1)
 model2 = LinearSVC()
 model2.fit(X_train, y_train)

@@ -23,7 +23,7 @@ from sklearn.model_selection import train_test_split
 #%%
 #using webscraped data in the form of nested lists stored as pickle files
 with open("Ishan_home_assist_text_submissions11.pickle", "rb") as input_file:
-    file1 = pickle.load(input_file)
+    home_assist = pickle.load(input_file)
 with open("text_submissions_hopscotch.pickle", "rb") as input_file:
       hopscotch = pickle.load(input_file)
 with open("saiparsa_Choice_Community_text.pickle", "rb") as input_file:
@@ -68,7 +68,8 @@ def preprocessing(forum_data):
 home_assist1 = preprocessing(home_assist)
 choice_community1 = preprocessing(choice_community10)
 hopscotch1 = preprocessing(hopscotch)
-code_academy1 =preprocessing(code_academy)
+bread1 =preprocessing(bread)
+gearbox1 = preprocessing(gearbox)
 #%%
 #convert paragraphs into sentences
 nltk.download('punkt')

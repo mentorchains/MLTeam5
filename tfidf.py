@@ -23,15 +23,15 @@ from sklearn.model_selection import train_test_split
 #%%
 #using webscraped data in the form of nested lists stored as pickle files
 with open("Ishan_home_assist_text_submissions11.pickle", "rb") as input_file:
-    home_assist = pickle.load(input_file)
+        home_assist = pickle.load(input_file)
 with open("text_submissions_hopscotch.pickle", "rb") as input_file:
-      hopscotch = pickle.load(input_file)
+        hopscotch = pickle.load(input_file)
 with open("saiparsa_Choice_Community_text.pickle", "rb") as input_file:
-      choice_community = pickle.load(input_file)
-with open("Dhruv_Bread_text_submissions_1hack.pickle", "rb") as input_file:
-      bread = pickle.load(input_file)
+        choice_community = pickle.load(input_file)
 with open("Kyle_text_submissions_Gearbox.pickle", "rb") as input_file:
-      gearbox = pickle.load(input_file)
+        gearbox = pickle.load(input_file)
+with open("Onehack.pickle", "rb") as input_file:
+        onehack = pickle.load(input_file)
 
 #%%
 
@@ -41,6 +41,8 @@ with open("Kyle_text_submissions_Gearbox.pickle", "rb") as input_file:
 choice_community10 = [[x[0], ' '.join(x[1])] for x in choice_community]
 #limiting the number of posts to 5000
 gearbox = gearbox[:5000]
+#getting the required list elements
+onehack = [[x[0], x[3]] for x in onehack]
 
 def preprocessing(forum_data):
 
@@ -68,15 +70,15 @@ def preprocessing(forum_data):
 home_assist1 = preprocessing(home_assist)
 choice_community1 = preprocessing(choice_community10)
 hopscotch1 = preprocessing(hopscotch)
-bread1 =preprocessing(bread)
 gearbox1 = preprocessing(gearbox)
+onehack1 = preprocessing(onehack)
 #%%
 #convert paragraphs into sentences
 nltk.download('punkt')
 home_assist1 = [[x[0], st(x[1])] for x in home_assist1]
 choice_community1 = [[x[0], st(x[1])] for x in choice_community1]
 hopscotch1 = [[x[0], st(x[1])] for x in hopscotch1]
-bread1 = [[x[0], st(x[1])] for x in bread1]
+onehack1 = [[x[0], st(x[1])] for x in onehack1]
 gearbox1 = [[x[0], st(x[1])] for x in gearbox1]
 
 #%%
@@ -97,14 +99,14 @@ choice_community3.insert(0, 'Forum_Name', 'Choice Community')
 hopscotch2 = convert_to_df(hopscotch1)
 hopscotch2.insert(0, 'Forum_Name', 'Hopscotch')
 
-bread2 = convert_to_df(bread1)
-bread2.insert(0, 'Forum_Name', 'Bread')
+onehack2 = convert_to_df(onehack1)
+onehack2.insert(0, 'Forum_Name', 'One Hack')
 
 gearbox2 = convert_to_df(gearbox1)
 gearbox2.insert(0, 'Forum_Name', 'Gearbox')
 
 #concatinating all the Dataframes of different forums
-forums = [home_assist2,hopscotch2,choice_community3, bread2, gearbox2]
+forums = [home_assist2,hopscotch2,choice_community3, onehack2, gearbox2]
 result_df = pd.concat(forums)
 
 #%%

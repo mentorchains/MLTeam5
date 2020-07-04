@@ -11,6 +11,7 @@ import requests
 import json
 import pprint
 import pickle
+from bs4 import BeautifulSoup
 
 def cleans_dictionary(raw_dictionary):
     #get all the slugs and topic_id's out of this dictionary (make sure the parameters are string)
@@ -33,6 +34,15 @@ user_url = "https://forum.gethopscotch.com/latest.json?no_definitions=true&order
 
 
 new_submissions = []
+
+latest_url = "https://forum.gethopscotch.com/latest"
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'}
+first_response = requests.get(latest_url).text
+soup = BeautifulSoup(first_response, 'lxml')
+topic_list = soup.find_all('span', class_='link-top-line')
+for topic in topic_list:
+    new_submissions.append([topic.find('a').attrs['href'].split("/")[-1], topic.get_text().strip()])
+
 crawler_condition = True
 while crawler_condition == True:
     url = user_url+str(i)

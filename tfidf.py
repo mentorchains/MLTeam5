@@ -19,6 +19,9 @@ from sklearn import metrics
 from sklearn.feature_selection import chi2
 from IPython.display import display
 from sklearn.model_selection import train_test_split
+import seaborn as sns
+import numpy as np
+from imblearn.over_sampling import SMOTE, ADASYN
 
 #%%
 #using webscraped data in the form of nested lists stored as pickle files
@@ -40,7 +43,7 @@ with open("Onehack.pickle", "rb") as input_file:
 #converting sentences into paragraph
 choice_community10 = [[x[0], ' '.join(x[1])] for x in choice_community]
 #limiting the number of posts to 5000
-gearbox = gearbox[:5000]
+gearbox = gearbox[:6000]
 #getting the required list elements
 onehack = [[x[0], x[3]] for x in onehack]
 
@@ -118,7 +121,7 @@ result_df1 = result_df.sample(frac=1)
 
 #%%
 #transforming post sentences into tfidf embeddings
-features = tfidf.fit_transform(result_df1.Posts_string)
+#features = tfidf.fit_transform(result_df1.Posts_string)
 #target lable
 labels = result_df1.Forum_Name
 #%%
@@ -126,10 +129,18 @@ labels = result_df1.Forum_Name
 X = result_df1['Posts_string'] 
 y = result_df1['Forum_Name']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state = 0)
+sm = SMOTE()
+ad = ADASYN()
 
+x_res = tfidf.fit_transform(X_train)
+X_test_tfidf = tfidf.transform(X_test)
+print(features.shape)
+#labels = y_train
+features, labels = ad.fit_sample(x_res, y_train)
+print(labels.shape)
 #%%
 #cross validation and accuracy check
-random_forest = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=0)
+random_forest = RandomForestClassifier(n_estimators=100, random_state=0)
 multi_nomial = MultinomialNB()
 lin_clf = LinearSVC()
 
@@ -156,14 +167,22 @@ acc = pd.concat([mean_accuracy, std_accuracy], axis= 1,
 acc.columns = ['Mean Accuracy', 'Standard deviation']
 acc
 #%%
-X_train, X_test, y_train, y_test,indices_train,indices_test = train_test_split(features, labels, result_df1.index, test_size=0.25, random_state=1)
-model2 = LinearSVC()
-model2.fit(X_train, y_train)
-y_pred = model2.predict(X_test)
+model = LinearSVC().fit(features, labels)
+X_train.shape
+y_train.shape
+y_pred = model.predict(X_test_tfidf)
 #%%
 print(confusion_matrix(y_test,y_pred))
-print(classification_report(y_test,y_pred))
-print(accuracy_score(y_test, y_pred))
+print('Classification Report: \n', classification_report(y_test,y_pred))
+print('Accuracy Score:', accuracy_score(y_test, y_pred))
+#%%
+#Confusion matrix using seaborn
+#Showing percentages
+sns.heatmap(cf_matrix/np.sum(cf_matrix), annot=True, 
+            fmt='.2%', cmap='Blues')
+#Showing actual numbers
+sns.heatmap(cf_matrix, annot=True, 
+            fmt='d', cmap='Blues')
 #%%
 #save file
 import joblib 
